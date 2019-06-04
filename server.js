@@ -3,6 +3,8 @@ const connectedToDB = require('./config/db');
 
 //Server Basic config
 const app = express();
+//Setup bodyparser
+app.use(express.json({ extended: false}));
 
 //Connect to Database
 connectedToDB();
