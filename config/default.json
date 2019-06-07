@@ -1,3 +1,4 @@
 {
-    "mongoURI": "mongodb+srv://ant-001:reo-911_go@social-bird-00-ykvf4.mongodb.net/test?retryWrites=true&w=majority"
+    "mongoURI": "mongodb+srv://ant-001:reo-911_go@social-bird-00-ykvf4.mongodb.net/test?retryWrites=true&w=majority",
+    "jwtSecret": "adQssw5cSflKxwRJ"
 }
