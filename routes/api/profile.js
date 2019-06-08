@@ -210,4 +210,60 @@ route.put('/experience', [
         }
     });
 
+
+//@route    POST api/profile/experience/:exp_id
+//@desc     Update profile experience
+//@access   Private
+
+route.post('/experience/:exp_id', [
+    auth, [
+        check('title', 'Title is required.').not().isEmpty(),
+        check('company', 'Company is required.').not().isEmpty(),
+        check('from', 'From date is required.').not().isEmpty(),
+    ]
+], async (req, res) => {
+    const error = validationResult(req);
+    if (!error) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+        let profile = await Profile.findOne({ user: req.user.id });
+        if (!profile) {
+            return res.status(400).json({ msg: 'Can\'t add experience, as there is no profile/experience found.' });
+        }
+
+        const {
+            title,
+            company,
+            location,
+            from,
+            to,
+            current,
+            description
+        } = req.body;
+
+        profile.experience.forEach(exp => {
+            if (exp._id.equals(req.params.exp_id)) {
+                if (title) exp.title = title;
+                if (company) exp.company = company;
+                if (location) exp.location = location;
+                if (from) exp.from = from;
+                if (to) exp.to = to;
+                if (current) exp.current = current;
+                if (description) exp.description = description;
+            }
+        });
+
+        await profile.save();
+        res.json(profile);
+
+    } catch (error) {
+        console.error(error.message);
+        if (error.kind == 'ObjectId') {
+            return res.status(400).json({ msg: 'There is no profile found for this user.' });
+        }
+        res.status(500).send('Server Error!');
+    }
+});
+
 module.exports = route;
