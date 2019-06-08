@@ -266,4 +266,27 @@ route.post('/experience/:exp_id', [
     }
 });
 
+//@route    DELETE api/profile/experience/:exp_id
+//@desc     Delete profile experience
+//@access   Private
+
+route.delete('/experience/:exp_id', auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({ user: req.user.id });
+        //Get index for remove experience
+        const removeIndex = profile.experience.map(exp => exp.id).indexOf(req.params.exp_id);
+
+        profile.experience.splice(removeIndex, 1);
+        await profile.save();
+        res.json(profile);
+
+    } catch (error) {
+        console.error(error.message);
+        if (error.kind == 'ObjectId') {
+            return res.status(400).json({ msg: 'There is no profile found for this user.' });
+        }
+        res.status(500).send('Server Error!');
+    }
+})
+
 module.exports = route;
