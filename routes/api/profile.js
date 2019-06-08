@@ -63,7 +63,7 @@ route.post('/', [auth, [
     if (req.body.githubusername) profileFields.githubusername = githubusername;
     // Skills - Spilt into array
     if (typeof skills !== 'undefined') {
-        profileFields.skills = skills.split(',');        
+        profileFields.skills = skills.split(',');
     }
 
     // Social object (optional fields)
@@ -152,5 +152,62 @@ route.delete('/', auth, async (req, res) => {
         res.status(500).send('Server Error!');
     }
 });
+
+
+//@route    PUT api/profile/experience
+//@desc     Add profile experience
+//@access   Private
+
+route.put('/experience', [
+    auth, [
+        check('title', 'Title is required.').not().isEmpty(),
+        check('company', 'Company is required.').not().isEmpty(),
+        check('from', 'From date is required.').not().isEmpty(),
+    ]], async (req, res) => {
+        try {
+            const error = validationResult(req);
+            if (!error) {
+                return res.status(400).json({ errors: errors.array() });
+            }
+            //Find the user profile
+            const profile = await Profile.findOne({ user: req.user.id });
+            if (!profile) {
+                return res.status(400).json({ msg: 'Can\'t add experience, as there is no profile found for this user..' });
+            }
+
+            const {
+                title,
+                company,
+                location,
+                from,
+                to,
+                current,
+                description
+            } = req.body;
+
+            const newExperience = {
+                title,
+                company,
+                location,
+                from,
+                to,
+                current,
+                description
+            };
+
+            //Add experience on profile as its default empty error
+            profile.experience.unshift(newExperience);//just like array.push 
+            //save the profile
+            await profile.save();
+            //Send the response
+            res.json(profile);
+        } catch (error) {
+            console.error(error.message);
+            if (error.kind == 'ObjectId') {
+                return res.status(400).json({ msg: 'There is no profile found for this user.' });
+            }
+            res.status(500).send('Server Error!');
+        }
+    });
 
 module.exports = route;
