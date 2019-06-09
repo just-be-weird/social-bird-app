@@ -168,7 +168,7 @@ route.put('/experience', [
     ]], async (req, res) => {
         try {
             const error = validationResult(req);
-            if (!error) {
+            if (!error.isEmpty()) {
                 return res.status(400).json({ errors: errors.array() });
             }
             //Find the user profile
@@ -225,7 +225,7 @@ route.post('/experience/:exp_id', [
     ]
 ], async (req, res) => {
     const error = validationResult(req);
-    if (!error) {
+    if (!error.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
     try {
@@ -305,7 +305,7 @@ route.put('/education', [
 ]
     , async (req, res) => {
         const error = validationResult(req);
-        if (!error) {
+        if (!error.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
         try {
