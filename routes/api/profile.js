@@ -287,6 +287,62 @@ route.delete('/experience/:exp_id', auth, async (req, res) => {
         }
         res.status(500).send('Server Error!');
     }
-})
+});
+
+//@route    PUT api/profile/education
+//@desc     Add education to profile
+//@access   Private
+
+route.put('/education', [
+    auth, [
+        check('school', 'School name is required.').not().isEmpty(),
+        check('degree', 'Degree name is required.').not().isEmpty(),
+        check('fieldofstudy', 'Field of study is required.').not().isEmpty(),
+        check('from', 'From date is required.').not().isEmpty(),
+    ]
+]
+    , async (req, res) => {
+        const error = validationResult(req);
+        if (!error) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        try {
+            const profile = await Profile.findOne({ user: req.user.id });
+            if (!profile) {
+                return res.status(400).json({ msg: 'Can\'t add education, as there is no profile/experience found.' });
+            }
+            //build the education object
+            const educationPayload = {};
+            const {
+                school,
+                degree,
+                fieldofstudy,
+                from,
+                to,
+                current,
+                description
+            } = req.body;
+
+            if (school) educationPayload.school = school;
+            if (degree) educationPayload.degree = degree;
+            if (fieldofstudy) educationPayload.fieldofstudy = fieldofstudy;
+            if (from) educationPayload.from = from;
+            if (to) educationPayload.to = to;
+            if (current) educationPayload.current = current;
+            if (description) educationPayload.description = description;
+
+            profile.education.unshift(educationPayload);
+            profile.save();
+            res.json(profile);
+
+        } catch (error) {
+            console.error(error.message);
+            if (error.kind == 'ObjectId') {
+                return res.status(400).json({ msg: 'There is no profile found for this user.' });
+            }
+            res.status(500).send('Server Error!');
+        }
+
+    });
 
 module.exports = route;
