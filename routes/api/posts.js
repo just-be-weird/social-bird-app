@@ -3,6 +3,7 @@ const route = express.Router();
 const auth = require('../../middlewares/auth');
 const { check, validationResult } = require('express-validator/check');
 const Profile = require('../../models/Profile.Model');
+const Post = require('../../models/Post.Model');
 const User = require('../../models/User.Model');
 const config = require('config');
 
@@ -19,7 +20,24 @@ route.post('/', [
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: error.array() });
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+
+        const newPost = new Post({
+            text: req.body.text,
+            name: user.name,
+            avatar: user.avatar,
+            user: req.user.id
+        });
+
+        const post = await newPost.save();
+        res.json(post);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server Error!');
     }
 });
 
