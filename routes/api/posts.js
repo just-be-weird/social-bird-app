@@ -195,4 +195,37 @@ route.post('/comment/:id', [
     }
 });
 
+//@route    DELETE api/posts/comment/:comment_id
+//@desc     Remove a comment by ID for specified post ID
+//@access   Private
+
+route.delete('/comment/:id/:comment_id', auth, async (req, res) => {
+    try {
+        //Fetch the post using :id viz targeted post id
+        const posts = await Post.findById(req.params.id);
+        //Pull out the comment using :comment_id
+        const comment = posts.comments.find(comment => comment.id === req.params.comment_id);
+        //make sure that comment exists
+        if (!comment) {
+            return res.status(404).json({ msg: "comment doesn't exists" });
+        }
+
+        //check user is Autherized for deleting comment
+        if (comment.user.toString() !== req.user.id) {
+            return res.status(401).json({ msg: "User not Autherized" });
+        }
+        //Get removeIndex
+        const removeIndex = posts.comments.map(comment => comment.user.toString()).indexOf(req.user.id);
+        //remove the post
+        posts.comments.splice(removeIndex, 1);
+
+        await posts.save();
+        res.json(posts.comments);
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server Error!');
+    }
+});
+
 module.exports = route;
