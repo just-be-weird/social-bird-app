@@ -332,7 +332,7 @@ route.put('/education', [
             if (description) educationPayload.description = description;
 
             profile.education.unshift(educationPayload);
-            profile.save();
+            await profile.save();
             res.json(profile);
 
         } catch (error) {
@@ -345,4 +345,28 @@ route.put('/education', [
 
     });
 
+
+//@route    DELETE api/profile/education/:edu_id
+//@desc     Delete profile education
+//@access   Private
+
+route.delete('/education/:edu_id', auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({ user: req.user.id });
+        if (!profile) {
+            return res.status(400).json({ msg: 'Can\'t delete education, as there is no profile/experience found.' });
+        }
+        const removeIndex = profile.education.map(edu => edu.id ).indexOf(req.params.edu_id);
+        profile.education.splice(removeIndex,1);
+        await profile.save();
+        
+        res.json(profile);
+    } catch (error) {
+        console.error(error.message);
+        if (error.kind == 'ObjectId') {
+            return res.status(400).json({ msg: 'There is no profile found for this user.' });
+        }
+        res.status(500).send('Server Error!');
+    }
+});
 module.exports = route;
