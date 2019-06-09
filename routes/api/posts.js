@@ -10,7 +10,7 @@ const config = require('config');
 
 //@route    POST api/posts
 //@desc     Create a post
-//@access   Privat3
+//@access   Private
 
 route.post('/', [
     auth,
@@ -35,6 +35,20 @@ route.post('/', [
 
         const post = await newPost.save();
         res.json(post);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server Error!');
+    }
+});
+
+//@route    GET api/posts
+//@desc     Get all post
+//@access   Private
+
+route.get('/', auth, async (req, res) => {
+    try {
+        const posts = await Post.find().sort({ date: -1 }).select('-password');
+        res.json(posts);
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Server Error!');
