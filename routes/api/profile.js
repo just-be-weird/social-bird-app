@@ -4,6 +4,8 @@ const auth = require('../../middlewares/auth');
 const Profile = require('../../models/Profile.Model');
 const User = require('../../models/User.Model');
 const { check, validationResult } = require('express-validator/check');
+const request = require('request');
+const config = require('config');
 
 
 //@route    GET api/profile/me
@@ -166,7 +168,7 @@ route.put('/experience', [
     ]], async (req, res) => {
         try {
             const error = validationResult(req);
-            if (!error) {
+            if (!error.isEmpty()) {
                 return res.status(400).json({ errors: errors.array() });
             }
             //Find the user profile
@@ -223,7 +225,7 @@ route.post('/experience/:exp_id', [
     ]
 ], async (req, res) => {
     const error = validationResult(req);
-    if (!error) {
+    if (!error.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
     try {
@@ -287,6 +289,115 @@ route.delete('/experience/:exp_id', auth, async (req, res) => {
         }
         res.status(500).send('Server Error!');
     }
-})
+});
+
+//@route    PUT api/profile/education
+//@desc     Add education to profile
+//@access   Private
+
+route.put('/education', [
+    auth, [
+        check('school', 'School name is required.').not().isEmpty(),
+        check('degree', 'Degree name is required.').not().isEmpty(),
+        check('fieldofstudy', 'Field of study is required.').not().isEmpty(),
+        check('from', 'From date is required.').not().isEmpty(),
+    ]
+]
+    , async (req, res) => {
+        const error = validationResult(req);
+        if (!error.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        try {
+            const profile = await Profile.findOne({ user: req.user.id });
+            if (!profile) {
+                return res.status(400).json({ msg: 'Can\'t add education, as there is no profile/experience found.' });
+            }
+            //build the education object
+            const educationPayload = {};
+            const {
+                school,
+                degree,
+                fieldofstudy,
+                from,
+                to,
+                current,
+                description
+            } = req.body;
+
+            if (school) educationPayload.school = school;
+            if (degree) educationPayload.degree = degree;
+            if (fieldofstudy) educationPayload.fieldofstudy = fieldofstudy;
+            if (from) educationPayload.from = from;
+            if (to) educationPayload.to = to;
+            if (current) educationPayload.current = current;
+            if (description) educationPayload.description = description;
+
+            profile.education.unshift(educationPayload);
+            await profile.save();
+            res.json(profile);
+
+        } catch (error) {
+            console.error(error.message);
+            if (error.kind == 'ObjectId') {
+                return res.status(400).json({ msg: 'There is no profile found for this user.' });
+            }
+            res.status(500).send('Server Error!');
+        }
+
+    });
+
+
+//@route    DELETE api/profile/education/:edu_id
+//@desc     Delete profile education
+//@access   Private
+
+route.delete('/education/:edu_id', auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({ user: req.user.id });
+        if (!profile) {
+            return res.status(400).json({ msg: 'Can\'t delete education, as there is no profile/experience found.' });
+        }
+        const removeIndex = profile.education.map(edu => edu.id).indexOf(req.params.edu_id);
+        profile.education.splice(removeIndex, 1);
+        await profile.save();
+
+        res.json(profile);
+    } catch (error) {
+        console.error(error.message);
+        if (error.kind == 'ObjectId') {
+            return res.status(400).json({ msg: 'There is no profile found for this user.' });
+        }
+        res.status(500).send('Server Error!');
+    }
+});
+
+//@route    GET api/profile/gitub/:username
+//@desc     Get users from github
+//@access   Public
+
+route.get('/github/:username', (req, res) => {
+    try {
+        const options = {
+            uri: `https://api.github.com/users/${req.params.username}/repos?per_page=5&sort=created:asc&client_id=${config.get('githubClientId')}$clien_secret=${config.get('githubSecret')}`,
+            method: 'GET',
+            headers: { 'user-agent': 'node.js' }
+        };
+
+        request(options, (error, response, body) => {
+            if (error) {
+                console.error(error);
+            }
+            if (response.statusCode !== 200) {
+                return res.status(404).json({ msg: 'No github profile found.' });
+            }
+
+            res.json(JSON.parse(body));
+        })
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).send('Server Error!');
+    }
+});
 
 module.exports = route;
