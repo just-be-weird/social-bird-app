@@ -358,10 +358,10 @@ route.delete('/education/:edu_id', auth, async (req, res) => {
         if (!profile) {
             return res.status(400).json({ msg: 'Can\'t delete education, as there is no profile/experience found.' });
         }
-        const removeIndex = profile.education.map(edu => edu.id ).indexOf(req.params.edu_id);
-        profile.education.splice(removeIndex,1);
+        const removeIndex = profile.education.map(edu => edu.id).indexOf(req.params.edu_id);
+        profile.education.splice(removeIndex, 1);
         await profile.save();
-        
+
         res.json(profile);
     } catch (error) {
         console.error(error.message);
@@ -380,16 +380,16 @@ route.get('/github/:username', (req, res) => {
     try {
         const options = {
             uri: `https://api.github.com/users/${req.params.username}/repos?per_page=5&sort=created:asc&client_id=${config.get('githubClientId')}$clien_secret=${config.get('githubSecret')}`,
-            method:'GET',
-            headers: { 'user-agent': 'node.js'}
+            method: 'GET',
+            headers: { 'user-agent': 'node.js' }
         };
 
-        request(options, ( error, response, body) => {
+        request(options, (error, response, body) => {
             if (error) {
                 console.error(error);
             }
-            if (response.statusCode !== 200 ) {
-               return res.status(404).json({ msg: 'No github profile found.'});
+            if (response.statusCode !== 200) {
+                return res.status(404).json({ msg: 'No github profile found.' });
             }
 
             res.json(JSON.parse(body));
