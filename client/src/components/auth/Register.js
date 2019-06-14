@@ -18,7 +18,7 @@ const Register = ({ setAlert }) => {
     const onsubmitHandler = e => {
         e.preventDefault();
         if (password !== password2) {
-            props.setAlert('Password dont match','danger');//calling redux action
+            setAlert('Password don\'t match.','danger',3000);//calling redux action
         } else {
             console.log(formData);
         }
