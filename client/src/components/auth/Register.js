@@ -1,11 +1,12 @@
 import React, { Fragment, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { setAlert } from '../../actions/alert';
+import { register } from '../../actions/auth';
 import PropTypes from 'prop-types'
 
 
-const Register = ({ setAlert }) => {
+const Register = ({ setAlert, register, isAuthenticated }) => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -18,12 +19,17 @@ const Register = ({ setAlert }) => {
     const onsubmitHandler = e => {
         e.preventDefault();
         if (password !== password2) {
-            setAlert('Password don\'t match.','danger',3000);//calling redux action
+            setAlert('Password don\'t match.', 'danger', 3000);//calling redux action
         } else {
-            console.log(formData);
+            register({ name, email, password })
         }
     }
 
+    //Redirect if logged in
+    if (isAuthenticated) {
+        return <Redirect to='/dashboard' />
+    }
+    
     return (
         <Fragment>
             <h1 className="large text-primary">Sign Up</h1>
@@ -46,7 +52,8 @@ const Register = ({ setAlert }) => {
                         name="email"
                         value={email}
                         onChange={e => onChangeHandler(e)}
-                        required />
+                        required
+                    />
                     <small className="form-text">
                         This site uses Gravatar so if you want a profile image, use a Gravatar email
                     </small>
@@ -81,8 +88,14 @@ const Register = ({ setAlert }) => {
 }
 
 Register.propTypes = {
-    setAlert: PropTypes.func.isRequired
+    setAlert: PropTypes.func.isRequired,
+    register: PropTypes.func.isRequired,
+    isAuthenticated: PropTypes.bool
 }
 
-;// connect(any state that needs to be mapped, any action that needs to be used, )
-export default connect(null, { setAlert })(Register)
+const mapStateToProps = state => ({
+    isAuthenticated: state.auth.isAuthenticated
+});
+
+// connect(any state that needs to be mapped, any action that needs to be used, )
+export default connect(mapStateToProps, { setAlert, register })(Register)

@@ -13,7 +13,6 @@ export const setAlert = (msg, alertType, time_out = 5000) => dispatch => {
         type: SET_ALERT,
         payload: { msg, alertType, id }
     });
-    console.log(time_out);
 
     setTimeout(() => {
         dispatch({
