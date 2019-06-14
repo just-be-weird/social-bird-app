@@ -1,7 +1,10 @@
 import React, { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types'
+import { login } from '../../actions/auth';
 
-const Register = () => {
+const Login = ({ login }) => {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -11,7 +14,7 @@ const Register = () => {
 
     const onsubmitHandler = e => {
         e.preventDefault();
-        console.log('Success.');
+        login({ email, password })
     }
 
     return (
@@ -19,15 +22,16 @@ const Register = () => {
             <h1 className="large text-primary">Sign In</h1>
             <p className="lead"><i className="fas fa-user"></i> Sign Into Your Account</p>
             <form className="form" onSubmit={e => onsubmitHandler(e)}>
-                
+
                 <div className="form-group">
-                    <input 
-                        type="email" 
+                    <input
+                        type="email"
                         placeholder="Email Address"
-                        name="email" 
+                        name="email"
                         value={email}
                         onChange={e => onChangeHandler(e)}
-                        required/>
+                        required
+                    />
                 </div>
                 <div className="form-group">
                     <input
@@ -48,4 +52,7 @@ const Register = () => {
     )
 }
 
-export default Register
+Login.propTypes = {
+    login: PropTypes.func.isRequired
+}
+export default connect(null, { login })(Login);
