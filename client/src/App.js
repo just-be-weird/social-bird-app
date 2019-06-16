@@ -4,6 +4,9 @@ import Navbar from './components/layouts/Navbar';
 import Landing from './components/layouts/Landing';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
+import Dashboard from './components/dashboard/Dashboard';
+import CreateProfile from './components/profile-forms/CreateProfile';
+import PrivateRoute from './components/routing/PrivateRoute';
 import Alert from './components/layouts/Alert'
 //Redux 
 import { Provider } from 'react-redux';//This combines redux and react togather
@@ -32,6 +35,8 @@ const App = () => {
 					<section className="container">
 						<Alert />
 						<Switch>
+							<PrivateRoute exact path='/dashboard' component={Dashboard} />
+							<PrivateRoute exact path='/create-profile' component={CreateProfile} />
 							<Route exact path='/login' component={Login} />
 							<Route exact path='/register' component={Register} />
 						</Switch>
