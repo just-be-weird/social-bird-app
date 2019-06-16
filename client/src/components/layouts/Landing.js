@@ -4,6 +4,9 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 const Landing = ({ isAuthenticated }) => {
+    /**Always remember that if we want jsx to be shown then from that point it should be either
+     * returned or it should be used in code block where jsx is being returned else we will get error
+     *  */
     if (isAuthenticated) {
         return <Redirect to='/dashboard' />
     }
