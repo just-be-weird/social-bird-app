@@ -9,6 +9,12 @@ const PrivateRoute = ({
     ...rest// rest is used to spread remaining props
 }) => {
     return (
+        /* 
+        So to recap, if you need to pass a prop to a component being rendered by React Router,
+        instead of using Routes component prop, use its render prop passing it an inline function
+        then pass along the arguments to the element you’re creating.
+        Ref:  https://tylermcginnis.com/react-router-pass-props-to-components/
+        */
         <Route
             {...rest}
             render={
