@@ -23,13 +23,13 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 profiles: payload,
-                laoding: false 
+                loading: false 
             };
 
         case PROFILE_ERROR:
             return {
                 ...state,
-                erorr: payload,
+                error: payload,
                 loading: false
             };
 
