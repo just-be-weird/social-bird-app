@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux';
 import Spinner from '../layouts/Spinner';
+import Experience from './Experience';
+import Education from './Education';
+import DashboardActions from './DashboardActions';
 import { getCurrentProfile } from '../../actions/profile';
 
 const Dashboard = ({ getCurrentProfile, auth: { user }, profile: { profile, loading } }) => {
@@ -21,9 +24,9 @@ const Dashboard = ({ getCurrentProfile, auth: { user }, profile: { profile, load
                     profile !== null ? 
                 (
                     <Fragment>
-                        {/* <DashboardActions />
+                         <DashboardActions />
                         <Experience experience={profile.experience} />
-                        <Education education={profile.education} /> */}
+                        <Education education={profile.education} />
 
                         {/* <div className='my-2'>
                             <button className='btn btn-danger' onClick={() => deleteAccount()}>
