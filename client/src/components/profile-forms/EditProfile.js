@@ -46,7 +46,7 @@ const EditProfile = ({
             instagram:
                 loading || !profile.social ? "" : profile.social.instagram,
         });
-    },[loading]);
+    },[getCurrentProfile,loading]);
 
     const {
         company,
@@ -262,8 +262,8 @@ const EditProfile = ({
 
 EditProfile.propTypes = {
     createProfile: PropTypes.func.isRequired,
-    getCurrentProfile: PropTypes.object.isRequired,
-    profile: PropTypes.func.isRequired,
+    getCurrentProfile: PropTypes.func.isRequired,
+    profile: PropTypes.object.isRequired,
 };
 const mapStateToProps = state => ({
     profile: state.profile,
