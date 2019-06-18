@@ -1,6 +1,0 @@
-{
-    "mongoURI": "mongodb+srv://ant-001:reo-911_go@social-bird-00-ykvf4.mongodb.net/test?retryWrites=true&w=majority",
-    "jwtSecret": "adQssw5cSflKxwRJ",
-    "githubClientId": "c7c3394245fa4a8dfa68",
-    "githubSecret": "4d05cd04bc332a3e1c18d4c6a79be6a925a476ce"
-}
